@@ -22,7 +22,8 @@
 
 use crate::{
 	balancing, setup_inputs, BalancingConfig, CandidatePtr, ElectionResult, ExtendedBalance,
-	IdentifierT, PerThing128, VoteWeight, Voter,
+	IdentifierT, PerThing128, VoteWeight, Voter, PhragmenTrace, LoadUpdate, EdgeLoadUpdate,
+  CandidateScoreUpdate, CandidateScoreUpdateByVoter
 };
 use sp_arithmetic::{
 	helpers_128bit::multiply_by_rational_with_rounding,
@@ -72,10 +73,10 @@ pub fn seq_phragmen<AccountId: IdentifierT, P: PerThing128>(
 	candidates: Vec<AccountId>,
 	voters: Vec<(AccountId, VoteWeight, impl IntoIterator<Item = AccountId>)>,
 	balancing: Option<BalancingConfig>,
-) -> Result<ElectionResult<AccountId, P>, crate::Error> {
+) -> Result<(ElectionResult<AccountId, P>, Vec<PhragmenTrace<AccountId>>), crate::Error> {
 	let (candidates, voters) = setup_inputs(candidates, voters);
 
-	let (candidates, mut voters) = seq_phragmen_core::<AccountId>(to_elect, candidates, voters)?;
+	let (candidates, mut voters, tracing) = seq_phragmen_core::<AccountId>(to_elect, candidates, voters)?;
 
 	if let Some(ref config) = balancing {
 		// NOTE: might create zero-edges, but we will strip them again when we convert voter into
@@ -103,7 +104,7 @@ pub fn seq_phragmen<AccountId: IdentifierT, P: PerThing128>(
 		.map(|w_ptr| (w_ptr.borrow().who.clone(), w_ptr.borrow().backed_stake))
 		.collect();
 
-	Ok(ElectionResult { winners, assignments })
+	Ok((ElectionResult { winners, assignments }, tracing))
 }
 
 /// Core implementation of seq-phragmen.
@@ -118,16 +119,26 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 	to_elect: usize,
 	candidates: Vec<CandidatePtr<AccountId>>,
 	mut voters: Vec<Voter<AccountId>>,
-) -> Result<(Vec<CandidatePtr<AccountId>>, Vec<Voter<AccountId>>), crate::Error> {
+) -> Result<(Vec<CandidatePtr<AccountId>>, Vec<Voter<AccountId>>, Vec<PhragmenTrace<AccountId>>), crate::Error> {
+		// tracing: Start
+		let mut tracing: Vec<PhragmenTrace<AccountId>> = vec![PhragmenTrace::Start];
+
 	// we have already checked that we have more candidates than minimum_candidate_count.
 	let to_elect = to_elect.min(candidates.len());
 
+  // tracing: ToElect
+  tracing.push(PhragmenTrace::ToElect(to_elect));
+
 	// main election loop
 	for round in 0..to_elect {
+		// tracing: RoundStart
+    tracing.push(PhragmenTrace::RoundStart(round, candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect(), voters.clone()));
+
 		// loop 1: initialize score
 		for c_ptr in &candidates {
 			let mut candidate = c_ptr.borrow_mut();
 			if !candidate.elected {
+		  	let tracing_score = candidate.score;
 				// 1 / approval_stake == (DEN / approval_stake) / DEN. If approval_stake is zero,
 				// then the ratio should be as large as possible, essentially `infinity`.
 				if candidate.approval_stake.is_zero() {
@@ -135,8 +146,13 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 				} else {
 					candidate.score = Rational128::from(DEN / candidate.approval_stake, DEN);
 				}
+				// tracing: CandidateScoreUpdated
+				tracing.push(PhragmenTrace::CandidateScoreUpdated(CandidateScoreUpdate { who: candidate.who.clone(), score: tracing_score, new_score: candidate.score }));
 			}
 		}
+
+		// tracing: CandidateScoresCalculated
+		tracing.push(PhragmenTrace::CandidateScoresCalculated(candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect()));
 
 		// loop 2: increment score
 		for voter in &voters {
@@ -152,10 +168,16 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 					.unwrap_or(Bounded::max_value());
 					let temp_d = voter.load.d();
 					let temp = Rational128::from(temp_n, temp_d);
+				  // tracing: CandidateScoreUpdateByVoter
+				  tracing.push(PhragmenTrace::CandidateScoreUpdatedByVoter(CandidateScoreUpdateByVoter { voter: voter.who.clone(), candidate: candidate.who.clone(), score: candidate.score, new_score: candidate.score.lazy_saturating_add(temp) } ));
+
 					candidate.score = candidate.score.lazy_saturating_add(temp);
 				}
 			}
 		}
+
+		// tracing: CandidateScoresUpdatedByVoters
+		tracing.push(PhragmenTrace::CandidateScoresUpdatedByVoters(candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect()));
 
 		// loop 3: find the best
 		if let Some(winner_ptr) = candidates
@@ -164,13 +186,23 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 			.min_by_key(|c| c.borrow().score)
 		{
 			let mut winner = winner_ptr.borrow_mut();
+		  // tracing: CandidateElected
+		  tracing.push(PhragmenTrace::CandidateElected(winner.clone()));
+
 			// loop 3: update voter and edge load
 			winner.elected = true;
 			winner.round = round;
 			for voter in &mut voters {
 				for edge in &mut voter.edges {
 					if edge.who == winner.who {
+						// tracing: VoterEdgeUpdated
+						tracing.push(PhragmenTrace::VoterEdgeUpdated(EdgeLoadUpdate { voter: voter.who.clone(), candidate: winner.who.clone(), load: edge.load, new_load: winner.score.lazy_saturating_sub(voter.load) }));
+
 						edge.load = winner.score.lazy_saturating_sub(voter.load);
+
+						// tracing: VoterLoadUpdated
+						tracing.push(PhragmenTrace::VoterLoadUpdated(LoadUpdate { who: voter.who.clone(), load: voter.load, new_load: winner.score }));
+
 						voter.load = winner.score;
 					}
 				}
@@ -208,5 +240,8 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 		voter.try_normalize_elected().map_err(crate::Error::ArithmeticError)?;
 	}
 
-	Ok((candidates, voters))
+		// tracing: finish
+		tracing.push(PhragmenTrace::Finish);
+
+	Ok((candidates, voters, tracing))
 }

@@ -98,6 +98,7 @@ pub mod phragmen;
 pub mod phragmms;
 pub mod pjr;
 pub mod reduce;
+pub mod tracing;
 pub mod traits;
 
 pub use assignments::{Assignment, StakedAssignment};
@@ -107,6 +108,7 @@ pub use phragmen::*;
 pub use phragmms::*;
 pub use pjr::*;
 pub use reduce::reduce;
+pub use tracing::*;
 pub use traits::{IdentifierT, PerThing128};
 
 /// The errors that might occur in this crate and `frame-election-provider-solution-type`.
@@ -231,20 +233,20 @@ pub type CandidatePtr<A> = Rc<RefCell<Candidate<A>>>;
 #[derive(RuntimeDebug, Clone, Default)]
 pub struct Candidate<AccountId> {
 	/// Identifier.
-	who: AccountId,
+	pub who: AccountId,
 	/// Score of the candidate.
 	///
 	/// Used differently in seq-phragmen and max-score.
-	score: Rational128,
+	pub score: Rational128,
 	/// Approval stake of the candidate. Merely the sum of all the voter's stake who approve this
 	/// candidate.
-	approval_stake: ExtendedBalance,
+	pub approval_stake: ExtendedBalance,
 	/// The final stake of this candidate. Will be equal to a subset of approval stake.
-	backed_stake: ExtendedBalance,
+	pub backed_stake: ExtendedBalance,
 	/// True if this candidate is already elected in the current election.
-	elected: bool,
+	pub elected: bool,
 	/// The round index at which this candidate was elected.
-	round: usize,
+	pub round: usize,
 }
 
 impl<AccountId> Candidate<AccountId> {
@@ -260,13 +262,13 @@ pub struct Edge<AccountId> {
 	///
 	/// This is equivalent of `self.candidate.borrow().who`, yet it helps to avoid double borrow
 	/// errors of the candidate pointer.
-	who: AccountId,
+	pub who: AccountId,
 	/// Load of this edge.
-	load: Rational128,
+	pub load: Rational128,
 	/// Pointer to the candidate.
-	candidate: CandidatePtr<AccountId>,
+	pub candidate: CandidatePtr<AccountId>,
 	/// The weight (i.e. stake given to `who`) of this edge.
-	weight: ExtendedBalance,
+	pub weight: ExtendedBalance,
 }
 
 #[cfg(test)]
@@ -289,13 +291,13 @@ impl<A: IdentifierT> sp_std::fmt::Debug for Edge<A> {
 #[derive(Clone, Default)]
 pub struct Voter<AccountId> {
 	/// Identifier.
-	who: AccountId,
+	pub who: AccountId,
 	/// List of candidates approved by this voter.
-	edges: Vec<Edge<AccountId>>,
+	pub edges: Vec<Edge<AccountId>>,
 	/// The stake of this voter.
-	budget: ExtendedBalance,
+	pub budget: ExtendedBalance,
 	/// Load of the voter.
-	load: Rational128,
+	pub load: Rational128,
 }
 
 #[cfg(feature = "std")]
