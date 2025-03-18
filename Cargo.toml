@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0"
 clap = { version = "4.5", features = ["derive"] }
 hex = "0.4"
+sp-arithmetic = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 sp-npos-elections = { git = "https://github.com/paritytech/polkadot-sdk", branch = "release-polkadot-v1.1.0" }
 subxt = "0.41.0"
 subxt-signer = "0.41.0"
