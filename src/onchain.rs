@@ -18,17 +18,20 @@ pub struct ElectionsDataOnChain {
 
 pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDataOnChain> {
     // Connect to node
-    event!(Level::INFO, "Connecting to {}", &args.uri);
+    event!(Level::INFO, "Connecting to {}  ", &args.uri);
     let api = OnlineClient::<SubstrateConfig>::from_url(&args.uri).await?;
 
     // Prepare block hash to operate on
     let block_hash = match args.at {
-        Some(hash) => hash,
+        Some(hash) => {
+            event!(Level::INFO, "Block hash: {:?}  ", hash);
+            hash
+        }
         None => {
             let latest_block_hash = api.blocks().at_latest().await?.hash();
             event!(
                 Level::INFO,
-                "Block hash not provided. Using latest block hash: {:?}",
+                "Block hash not provided. Using latest block hash: {:?}  ",
                 latest_block_hash
             );
             latest_block_hash
@@ -76,6 +79,8 @@ pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDat
         let voter_account = <SubstrateConfig as subxt::Config>::AccountId::from(who);
         voting.push((voter_account, voter));
     }
+
+    event!(Level::INFO, "  ");
 
     Ok(ElectionsDataOnChain {
         election_rounds,

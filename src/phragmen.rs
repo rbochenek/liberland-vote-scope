@@ -2,7 +2,7 @@ use super::ElectionsDataOnChain;
 use crate::substrate::runtime_types::pallet_elections_phragmen::Voter;
 use anyhow::{Result, bail};
 use sp_arithmetic::per_things::Perbill;
-use sp_npos_elections::ElectionResult;
+use sp_npos_elections::{ElectionResult, PhragmenTrace};
 use subxt::utils::AccountId32;
 
 #[derive(Default, Debug)]
@@ -54,14 +54,19 @@ pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<Phragme
     })
 }
 
-pub fn run_phragmen(inputs: PhragmenInputs) -> Result<ElectionResult<AccountId32, Perbill>> {
+pub fn run_phragmen(
+    inputs: PhragmenInputs,
+) -> Result<(
+    ElectionResult<AccountId32, Perbill>,
+    Vec<PhragmenTrace<AccountId32>>,
+)> {
     match sp_npos_elections::seq_phragmen::<AccountId32, Perbill>(
         inputs.to_elect,
         inputs.candidates,
         inputs.voters,
         None,
     ) {
-        Ok(results) => Ok(results),
+        Ok((results, tracing)) => Ok((results, tracing)),
         Err(_) => {
             bail!("seq_phragmen() normalization error");
         }

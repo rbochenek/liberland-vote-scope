@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use sp_npos_elections::PhragmenTrace;
 use subxt::SubstrateConfig;
 use tracing::{Level, event};
 
@@ -44,6 +45,9 @@ async fn main() -> Result<()> {
         } else {
             Level::INFO
         })
+        .without_time()
+        .with_target(false)
+        .with_level(false)
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("Default tracing subscriber error");
 
@@ -64,10 +68,79 @@ async fn main() -> Result<()> {
     }
 
     // Run Phragmen
-    let phragmen_results = run_phragmen(phragmen_inputs)?;
-    event!(Level::INFO, "--- Phragmen output ---");
+    let (phragmen_results, phragmen_tracing) = run_phragmen(phragmen_inputs)?;
+
+    // Show Phragmen results
+    event!(Level::INFO, "--- Phragmen results ---");
     for winner in &phragmen_results.winners {
         event!(Level::INFO, "{} {}", winner.0.to_string(), winner.1);
+    }
+
+    // Show Phragmen tracing
+    event!(Level::INFO, "--- Phragmen traces ---");
+    for trace in &phragmen_tracing {
+        match trace {
+            PhragmenTrace::Start => event!(Level::INFO, "Phragmen started"),
+            PhragmenTrace::Finish => event!(Level::INFO, "Phragmen finished"),
+            PhragmenTrace::ToElect(to_elect) => {
+                event!(Level::INFO, "Candidates to elect: {to_elect}")
+            }
+            PhragmenTrace::RoundStart(round_no, candidates, voters) => {
+                event!(
+                    Level::INFO,
+                    "Election round {round_no} [candidates: {}, voters: {}]",
+                    candidates.len(),
+                    voters.len()
+                )
+            }
+            PhragmenTrace::CandidateScoresCalculated(_candidates) => {
+                event!(Level::INFO, "Candidate scores calculated")
+            }
+            PhragmenTrace::CandidateScoresUpdatedByVoters(_candidates) => {
+                event!(Level::INFO, "Candidate scores updated by voters")
+            }
+            PhragmenTrace::CandidateElected(winner) => {
+                event!(Level::INFO, "Candidate elected: {}", winner.who.to_string())
+            }
+            PhragmenTrace::VoterEdgeUpdated(edge) => {
+                event!(
+                    Level::INFO,
+                    "Voter edge load updated {} => {} [{:?} => {:?}]",
+                    edge.voter.to_string(),
+                    edge.candidate.to_string(),
+                    edge.load,
+                    edge.new_load,
+                )
+            }
+            PhragmenTrace::VoterLoadUpdated(load) => {
+                event!(
+                    Level::INFO,
+                    "Voter load updated {} [{:?} => {:?}]",
+                    load.who.to_string(),
+                    load.load,
+                    load.new_load
+                );
+            }
+            PhragmenTrace::CandidateScoreUpdated(update) => {
+                event!(
+                    Level::INFO,
+                    "Candidate score updated {} [{:?} => {:?}]",
+                    update.who.to_string(),
+                    update.score,
+                    update.new_score
+                );
+            }
+            PhragmenTrace::CandidateScoreUpdatedByVoter(update) => {
+                event!(
+                    Level::INFO,
+                    "Candidate score updated by voter {} => {} [{:?} => {:?}]",
+                    update.voter.to_string(),
+                    update.candidate.to_string(),
+                    update.score,
+                    update.new_score
+                );
+            }
+        }
     }
 
     Ok(())
