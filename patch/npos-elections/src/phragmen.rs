@@ -134,6 +134,9 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 		// tracing: RoundStart
     tracing.push(PhragmenTrace::RoundStart(round, candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect(), voters.clone()));
 
+		// tracing: ComputeCandidateScores
+		tracing.push(PhragmenTrace::ComputeCandidateScores);
+
 		// loop 1: initialize score
 		for c_ptr in &candidates {
 			let mut candidate = c_ptr.borrow_mut();
@@ -153,6 +156,9 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 
 		// tracing: CandidateScoresCalculated
 		tracing.push(PhragmenTrace::CandidateScoresCalculated(candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect()));
+
+		// tracing: IncCandidateScoresByVoters
+		tracing.push(PhragmenTrace::IncCandidateScoresByVoters);
 
 		// loop 2: increment score
 		for voter in &voters {
