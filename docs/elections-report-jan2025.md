@@ -1,6 +1,7 @@
 # Before elections  
   
 On-chain data fetched from block hash 0x1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d  
+Elections so far: 4  
   
 <details open>
 <summary>Members</summary>  
@@ -17,6 +18,7 @@ On-chain data fetched from block hash 0x1b983f5466bdf8675ddace127e48f809ea899246
 | 5HgUQWZ4HHmivA2kqcXb8TTQVjH11FRphsRj4BBEhBzwUbS8 | 331673638137259824 | 10000000000000 |  
   
 Total count: 7  
+  
 </details>  
 <details open>
 <summary>Runners up</summary>  
@@ -33,6 +35,25 @@ Total count: 7
 | 5GsgvTPgcwL8zAE1g9ci9Y53Psq3BygXJ4VGkKKTk6vPnrrU | 295818134180790328 | 10000000000000 |  
   
 Total count: 7  
+  
+</details>  
+  
+  
+<details open>
+<summary>Candidates</summary>  
+  
+  
+| Account | Deposit |  
+| --- | --- |  
+| 5CML8aCLBYuq3AophkAmCTqydX1sbpjEXYUiYsB2vbJXFrCP | 10000000000000 |  
+| 5CXMh5e1axoxPFu4BVk3aZS8pBg6G1NyoLnU52ox1r4F1BLi | 10000000000000 |  
+| 5DU95W8UfVdunm2PRU6oWq21SHFZRwbU9KPMjDsBZHj9xXk7 | 10000000000000 |  
+| 5FAFyEv8kMh4XvPeeX9Pgct6TpziDGeMd8oHL8qcGb93LD5K | 10000000000000 |  
+| 5FbtYgbTz1Y6nyYUWvbwYRTaYZL6EBWBt69L1uBqs5CCTiuH | 10000000000000 |  
+| 5H5uqqLobEgZtkQytuemR6JXfvu895HqYhoRqsqWgodsJH3E | 10000000000000 |  
+| 5HKUy9pr8tZyyJmZq4U1wk1i5qiZD6H6cz8jJ6zvUpEtLCkA | 10000000000000 |  
+Total count: 7  
+  
 </details>  
   
 # Phragmen traces  
@@ -476,7 +497,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5DWksiy
 Account: 5GEUDCyZrzPy1A6Kn288pHZFDtVhfYWvYmU1iTUPMg6YSVTE  
 Score: Rational128(44633816806751278446 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 7623868879379986204  
-Backed stake: 0  
 </details>  
   
 ## Round 1  
@@ -889,7 +909,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5DWksiy
 Account: 5HgUQWZ4HHmivA2kqcXb8TTQVjH11FRphsRj4BBEhBzwUbS8  
 Score: Rational128(85526964152629952239 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 7301663273120003860  
-Backed stake: 0  
 </details>  
   
 ## Round 2  
@@ -1263,7 +1282,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5DWksiy
 Account: 5Gh5W9uRMYXZsJ93dtndPYzCEyCG5EonKuRX5VACZPk7TaZ3  
 Score: Rational128(132181168227482703969 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 6812823772173082484  
-Backed stake: 0  
 </details>  
   
 ## Round 3  
@@ -1605,7 +1623,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5DWksiy
 Account: 5Gx8Gj8uNisAVa2WaMx9defTN3tGZpssDepDytojuDfPXTjo  
 Score: Rational128(182641197998872099779 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 6662459821451493716  
-Backed stake: 0  
 </details>  
   
 ## Round 4  
@@ -1932,7 +1949,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5DWksiy
 Account: 5DWksiyzLoSUTtP5xcKspyHsvfdDHuePJvvZgbLpUNz3AaKQ  
 Score: Rational128(232480072637796086145 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 6652713609792221260  
-Backed stake: 0  
 </details>  
   
 ## Round 5  
@@ -2239,7 +2255,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5DU95W8UfVdunm2PRU6oWq21SHFZRwbU9KPMjDsBZHj9xXk7  
 Score: Rational128(298476258534621865924 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 5025976948096175104  
-Backed stake: 0  
 </details>  
   
 ## Round 6  
@@ -2540,7 +2555,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo  
 Score: Rational128(330069114248337148398 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 2370916618008836374  
-Backed stake: 0  
 </details>  
   
 ## Round 7  
@@ -2786,7 +2800,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5CML8aCLBYuq3AophkAmCTqydX1sbpjEXYUiYsB2vbJXFrCP  
 Score: Rational128(372892917686654946504 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 3873249130332221260  
-Backed stake: 0  
 </details>  
   
 ## Round 8  
@@ -3020,7 +3033,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5F1Sbb3T7wCmZWpi9PVa2ChjkZkdNcyRSWFeUiE6BrwYU9BV  
 Score: Rational128(511023968252840800963 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 1835459086180221260  
-Backed stake: 0  
 </details>  
   
 ## Round 9  
@@ -3234,7 +3246,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5DHpFfgUCwCSKuALr8WGdQE283fouy8wquVn5iRZzQPiowfa  
 Score: Rational128(562252278729347295261 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 1011094708706740560  
-Backed stake: 0  
 </details>  
   
 ## Round 10  
@@ -3402,7 +3413,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5H5uqqLobEgZtkQytuemR6JXfvu895HqYhoRqsqWgodsJH3E  
 Score: Rational128(842396168267274882988 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 926442252545912940  
-Backed stake: 0  
 </details>  
   
 ## Round 11  
@@ -3552,7 +3562,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5Ged7EAwZVAdmJjgLAebPvF9qQEGeXBLRprc7fbvE4Hy5WD1  
 Score: Rational128(1059270939678093012296 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 629232267640175104  
-Backed stake: 0  
 </details>  
   
 ## Round 12  
@@ -3691,7 +3700,6 @@ Voter 5H9PQeeGeT6q7GCL4xUYYhKXRMFWw3hUFNxB2VPpZ6AGzDpo updated candidate 5GsgvTP
 Account: 5GsgvTPgcwL8zAE1g9ci9Y53Psq3BygXJ4VGkKKTk6vPnrrU  
 Score: Rational128(1139931521429097011599 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 970199455349517981  
-Backed stake: 0  
 </details>  
   
 ## Round 13  
@@ -3808,7 +3816,6 @@ Voter 5EFTdC7tDusBdhG1X7t59SJG2ZXcTdYHSPMgbxxsih9x5pZ6 updated candidate 5FbtYgb
 Account: 5EndVFLHwTNpwwESY12qPxmSWsykXSnAQLUoXAQiDcmq4aQr  
 Score: Rational128(1415899640142399589437 / 340282366920938463463374607431768211455 ≈ 0.00000000)  
 Approval stake: 698838020415824024  
-Backed stake: 0  
 </details>  
   
   
@@ -3837,5 +3844,6 @@ Backed stake: 0
 | 5GsgvTPgcwL8zAE1g9ci9Y53Psq3BygXJ4VGkKKTk6vPnrrU | 286899667835573933 |  
 | 5EndVFLHwTNpwwESY12qPxmSWsykXSnAQLUoXAQiDcmq4aQr | 240329439512192856 |  
 Total count: 14  
+  
 </details>  
   
