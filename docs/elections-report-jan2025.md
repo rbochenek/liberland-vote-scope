@@ -1,0 +1,83 @@
+# Before elections  
+  
+On-chain data fetched from block hash 0x1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d  
+  
+<details>
+<summary>Members</summary>  
+  
+  
+| Account | Stake | Deposit |  
+| --- | --- | --- |  
+| 5DWksiyzLoSUTtP5xcKspyHsvfdDHuePJvvZgbLpUNz3AaKQ | 1121250861780871157 | 10000000000000 |  
+| 5EndVFLHwTNpwwESY12qPxmSWsykXSnAQLUoXAQiDcmq4aQr | 961314322033832075 | 10000000000000 |  
+| 5F1Sbb3T7wCmZWpi9PVa2ChjkZkdNcyRSWFeUiE6BrwYU9BV | 933869573714704096 | 10000000000000 |  
+| 5GEUDCyZrzPy1A6Kn288pHZFDtVhfYWvYmU1iTUPMg6YSVTE | 359787983935098240 | 10000000000000 |  
+| 5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo | 441995649190016469 | 10000000000000 |  
+| 5Gh5W9uRMYXZsJ93dtndPYzCEyCG5EonKuRX5VACZPk7TaZ3 | 968266088124319083 | 10000000000000 |  
+| 5HgUQWZ4HHmivA2kqcXb8TTQVjH11FRphsRj4BBEhBzwUbS8 | 331673638137259824 | 10000000000000 |  
+  
+Total count: 7  
+</details>  
+<details>
+<summary>Runners up</summary>  
+  
+  
+| Account | Stake | Deposit |  
+| --- | --- | --- |  
+| 5Gx8Gj8uNisAVa2WaMx9defTN3tGZpssDepDytojuDfPXTjo | 250739360147201567 | 10000000000000 |  
+| 5H1SbrxxgcA5DSRwsAZx9qKp8C8AQftNTF1hVouUDdCkWDHG | 251094683740158676 | 10000000000000 |  
+| 5Ged7EAwZVAdmJjgLAebPvF9qQEGeXBLRprc7fbvE4Hy5WD1 | 325093270032887854 | 10000000000000 |  
+| 5DHpFfgUCwCSKuALr8WGdQE283fouy8wquVn5iRZzQPiowfa | 367362358054695754 | 10000000000000 |  
+| 5CCaLGgbk936jJCG2v6y55StBtTR3gmfn9GSt7Y6ETtFmr3N | 269773331562684806 | 10000000000000 |  
+| 5EhrpPpNbsyvq9WYwiMBWnwndCTrtKWBCtNxnGwYG7G7NukQ | 460291372486077631 | 10000000000000 |  
+| 5GsgvTPgcwL8zAE1g9ci9Y53Psq3BygXJ4VGkKKTk6vPnrrU | 295818134180790328 | 10000000000000 |  
+  
+Total count: 7  
+</details>  
+  
+# Phragmen traces  
+  
+Candidates to elect: 14  
+  
+## Round 0  
+## Round 1  
+## Round 2  
+## Round 3  
+## Round 4  
+## Round 5  
+## Round 6  
+## Round 7  
+## Round 8  
+## Round 9  
+## Round 10  
+## Round 11  
+## Round 12  
+## Round 13  
+  
+  
+# Election results  
+  
+  
+<details>
+<summary>Winners</summary>  
+  
+  
+| Account | Approval stake |  
+| --- | --- |  
+| 5GEUDCyZrzPy1A6Kn288pHZFDtVhfYWvYmU1iTUPMg6YSVTE | 1590706731526159616 |  
+| 5HgUQWZ4HHmivA2kqcXb8TTQVjH11FRphsRj4BBEhBzwUbS8 | 810369097172402215 |  
+| 5Gh5W9uRMYXZsJ93dtndPYzCEyCG5EonKuRX5VACZPk7TaZ3 | 851604456829381755 |  
+| 5Gx8Gj8uNisAVa2WaMx9defTN3tGZpssDepDytojuDfPXTjo | 898131326592901612 |  
+| 5DWksiyzLoSUTtP5xcKspyHsvfdDHuePJvvZgbLpUNz3AaKQ | 856832331631507439 |  
+| 5DU95W8UfVdunm2PRU6oWq21SHFZRwbU9KPMjDsBZHj9xXk7 | 942331303852799165 |  
+| 5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo | 508251907714755756 |  
+| 5CML8aCLBYuq3AophkAmCTqydX1sbpjEXYUiYsB2vbJXFrCP | 755202810369641222 |  
+| 5F1Sbb3T7wCmZWpi9PVa2ChjkZkdNcyRSWFeUiE6BrwYU9BV | 550248223888298833 |  
+| 5DHpFfgUCwCSKuALr8WGdQE283fouy8wquVn5iRZzQPiowfa | 432059536099216495 |  
+| 5H5uqqLobEgZtkQytuemR6JXfvu895HqYhoRqsqWgodsJH3E | 272131978336869852 |  
+| 5Ged7EAwZVAdmJjgLAebPvF9qQEGeXBLRprc7fbvE4Hy5WD1 | 305453654137403541 |  
+| 5GsgvTPgcwL8zAE1g9ci9Y53Psq3BygXJ4VGkKKTk6vPnrrU | 286899667835573933 |  
+| 5EndVFLHwTNpwwESY12qPxmSWsykXSnAQLUoXAQiDcmq4aQr | 240329439512192856 |  
+Total count: 14  
+</details>  
+  
