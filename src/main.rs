@@ -16,7 +16,7 @@ mod phragmen;
 use phragmen::*;
 
 #[subxt::subxt(
-    runtime_metadata_path = "./artifacts/dev.scale",
+    runtime_metadata_path = "./artifacts/mainnet.scale",
     derive_for_all_types = "Clone"
 )]
 pub mod substrate {}
