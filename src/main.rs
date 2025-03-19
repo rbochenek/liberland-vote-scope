@@ -69,7 +69,6 @@ async fn main() -> Result<()> {
 
     // Generate elections report
     let report = generate_elections_report(&onchain, &phragmen_results, &phragmen_tracing);
-    event!(Level::INFO, "{}", report);
 
     // (optional) Save elections report
     if let Some(path) = args.output {
@@ -79,6 +78,11 @@ async fn main() -> Result<()> {
             path.display()
         );
         fs::write(path, report).expect("Error saving elections report");
+    } else {
+        event!(
+            Level::WARN,
+            "No output file specified (see `--output`), discarding generated data."
+        );
     }
 
     Ok(())

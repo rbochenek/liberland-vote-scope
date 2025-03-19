@@ -24,11 +24,7 @@ pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDat
         }
         None => {
             let latest_block_hash = api.blocks().at_latest().await?.hash();
-            event!(
-                Level::INFO,
-                "Block hash not provided. Using latest block hash: {:?}  ",
-                latest_block_hash
-            );
+            event!(Level::INFO, "Latest block hash: {:?}  ", latest_block_hash);
             latest_block_hash
         }
     };
@@ -74,8 +70,6 @@ pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDat
         let voter_account = <SubstrateConfig as subxt::Config>::AccountId::from(who);
         voting.push((voter_account, voter));
     }
-
-    event!(Level::INFO, "  ");
 
     Ok(ElectionsDataOnChain {
         block_hash,
