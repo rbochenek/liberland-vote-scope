@@ -1,18 +1,17 @@
-use crate::substrate::runtime_types::pallet_elections_phragmen::SeatHolder;
+use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
 use anyhow::Result;
 use clap::Parser;
 use sp_arithmetic::per_things::Perbill;
 use sp_npos_elections::{ElectionResult, PhragmenTrace};
 use std::fs;
 use std::path::PathBuf;
-use subxt::SubstrateConfig;
-use subxt::config::substrate::AccountId32;
+use subxt::{SubstrateConfig, config::substrate::AccountId32, utils::H256};
 use tracing::{Level, event};
 
 mod markdown;
 use markdown::generate_elections_report;
 mod onchain;
-pub use onchain::ElectionsDataOnChain;
+use onchain::ElectionsDataOnChain;
 use onchain::download_onchain_elections_data;
 mod phragmen;
 use phragmen::*;
