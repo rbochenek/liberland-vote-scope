@@ -1,20 +1,18 @@
 use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
+use actix_web::{App, HttpServer, Responder, get};
 use anyhow::{Result, bail};
 use clap::Parser;
 use sp_arithmetic::per_things::Perbill;
 use sp_npos_elections::{ElectionResult, PhragmenTrace};
-use std::fs;
-use std::path::PathBuf;
 use subxt::{Config, OnlineClient, SubstrateConfig};
 use tracing::{Level, event};
 
+mod api;
+use api::*;
 mod markdown;
-use markdown::generate_elections_report;
 mod onchain;
 use onchain::ElectionsDataOnChain;
-use onchain::download_onchain_elections_data;
 mod phragmen;
-use phragmen::*;
 
 #[subxt::subxt(
     runtime_metadata_path = "./artifacts/mainnet.scale",
@@ -39,14 +37,10 @@ struct Args {
     /// Increase logging verbosity
     #[arg(short, long, default_value_t = false)]
     verbose: bool,
-
-    /// Path to save elections report to
-    #[arg(short, long)]
-    output: Option<PathBuf>,
 }
 
-#[tokio::main]
-async fn main() -> Result<()> {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     // Parse command line arguments
     let args = Args::parse();
 
@@ -60,32 +54,10 @@ async fn main() -> Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("Default tracing subscriber error");
 
-    // Download on-chain Elections data
-    let onchain = download_onchain_elections_data(&args).await?;
-
-    // Prepare Phragmen inputs
-    let phragmen_inputs = prepare_phragmen_inputs(&onchain)?;
-
-    // Run Phragmen
-    let (phragmen_results, phragmen_tracing) = run_phragmen(phragmen_inputs)?;
-
-    // Generate elections report
-    let report = generate_elections_report(&onchain, &phragmen_results, &phragmen_tracing);
-
-    // (optional) Save elections report
-    if let Some(path) = args.output {
-        event!(
-            Level::INFO,
-            "Saving elections report to: {}",
-            path.display()
-        );
-        fs::write(path, report).expect("Error saving elections report");
-    } else {
-        event!(
-            Level::WARN,
-            "No output file specified (see `--output`), discarding generated data."
-        );
-    }
-
-    Ok(())
+    // Start HTTP server
+    HttpServer::new(|| App::new().service(election))
+        .workers(3)
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }
