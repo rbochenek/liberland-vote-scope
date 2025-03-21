@@ -3,6 +3,8 @@ use super::*;
 #[derive(Default, Debug)]
 pub struct ElectionsDataOnChain {
     pub block_hash: <SubstrateConfig as Config>::Hash,
+    pub desired_members: u32,
+    pub desired_runners_up: u32,
     pub election_rounds: u32,
     pub members: Vec<SeatHolder<AccountId, u128>>,
     pub runners_up: Vec<SeatHolder<AccountId, u128>>,
@@ -27,6 +29,20 @@ pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDat
             latest_block_hash
         }
     };
+
+    // Fetch constants: DesiredMembers, DesiredRunnersUp
+    let desired_members = api
+        .constants()
+        .at(&substrate::constants().elections().desired_members())?;
+    let desired_runners_up = api
+        .constants()
+        .at(&substrate::constants().elections().desired_runners_up())?;
+    event!(
+        Level::INFO,
+        "DesiredMembers = {}, DesiredRunnersUp = {}",
+        desired_members,
+        desired_runners_up
+    );
 
     // Fetch Elections data
     let storage = api.storage().at(block_hash);
@@ -72,6 +88,8 @@ pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDat
 
     Ok(ElectionsDataOnChain {
         block_hash,
+        desired_members,
+        desired_runners_up,
         election_rounds,
         members,
         runners_up,
