@@ -1,14 +1,13 @@
 use super::*;
-use subxt::{OnlineClient, SubstrateConfig};
 
 #[derive(Default, Debug)]
 pub struct ElectionsDataOnChain {
-    pub block_hash: H256,
+    pub block_hash: <SubstrateConfig as Config>::Hash,
     pub election_rounds: u32,
-    pub members: Vec<SeatHolder<AccountId32, u128>>,
-    pub runners_up: Vec<SeatHolder<AccountId32, u128>>,
-    pub candidates: Vec<(AccountId32, u128)>,
-    pub voting: Vec<(AccountId32, Voter<AccountId32, u128>)>,
+    pub members: Vec<SeatHolder<AccountId, u128>>,
+    pub runners_up: Vec<SeatHolder<AccountId, u128>>,
+    pub candidates: Vec<(AccountId, u128)>,
+    pub voting: Vec<(AccountId, Voter<AccountId, u128>)>,
 }
 
 pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDataOnChain> {

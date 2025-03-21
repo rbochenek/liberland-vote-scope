@@ -2,8 +2,8 @@ use super::*;
 
 pub fn generate_elections_report(
     onchain: &ElectionsDataOnChain,
-    results: &ElectionResult<AccountId32, Perbill>,
-    tracing: &Vec<PhragmenTrace<AccountId32>>,
+    results: &ElectionResult<AccountId, Perbill>,
+    tracing: &Vec<PhragmenTrace<AccountId>>,
 ) -> String {
     let mut out = String::new();
 
@@ -49,7 +49,7 @@ fn generate_elections_report_inputs(onchain: &ElectionsDataOnChain) -> String {
     out
 }
 
-fn generate_elections_report_phragmen_traces(tracing: &Vec<PhragmenTrace<AccountId32>>) -> String {
+fn generate_elections_report_phragmen_traces(tracing: &Vec<PhragmenTrace<AccountId>>) -> String {
     let mut out = String::new();
 
     for trace in tracing {
@@ -101,7 +101,7 @@ fn generate_elections_report_phragmen_traces(tracing: &Vec<PhragmenTrace<Account
 
     out
 }
-fn generate_elections_report_outcome(results: &ElectionResult<AccountId32, Perbill>) -> String {
+fn generate_elections_report_outcome(results: &ElectionResult<AccountId, Perbill>) -> String {
     let mut out = String::new();
 
     out += "# Election results  \n  \n";
@@ -116,7 +116,7 @@ fn generate_elections_report_outcome(results: &ElectionResult<AccountId32, Perbi
     out
 }
 
-fn table_seatholders(seatholders: &Vec<SeatHolder<AccountId32, u128>>) -> String {
+fn table_seatholders(seatholders: &Vec<SeatHolder<AccountId, u128>>) -> String {
     let mut out = String::new();
 
     out += "  \n";
@@ -135,7 +135,7 @@ fn table_seatholders(seatholders: &Vec<SeatHolder<AccountId32, u128>>) -> String
     out
 }
 
-fn table_candidates(candidates: &Vec<(AccountId32, u128)>) -> String {
+fn table_candidates(candidates: &Vec<(AccountId, u128)>) -> String {
     let mut out = String::new();
 
     out += "  \n";
@@ -148,7 +148,7 @@ fn table_candidates(candidates: &Vec<(AccountId32, u128)>) -> String {
     out
 }
 
-fn table_winners(results: &ElectionResult<AccountId32, Perbill>) -> String {
+fn table_winners(results: &ElectionResult<AccountId, Perbill>) -> String {
     let mut out = String::new();
 
     out += "  \n";

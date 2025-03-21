@@ -1,15 +1,10 @@
-use super::ElectionsDataOnChain;
-use crate::substrate::runtime_types::pallet_elections_phragmen::Voter;
-use anyhow::{Result, bail};
-use sp_arithmetic::per_things::Perbill;
-use sp_npos_elections::{ElectionResult, PhragmenTrace};
-use subxt::utils::AccountId32;
+use super::*;
 
 #[derive(Default, Debug)]
 pub struct PhragmenInputs {
     pub to_elect: usize,
-    pub candidates: Vec<AccountId32>,
-    pub voters: Vec<(AccountId32, u64, Vec<AccountId32>)>,
+    pub candidates: Vec<AccountId>,
+    pub voters: Vec<(AccountId, u64, Vec<AccountId>)>,
 }
 
 pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<PhragmenInputs> {
@@ -57,10 +52,10 @@ pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<Phragme
 pub fn run_phragmen(
     inputs: PhragmenInputs,
 ) -> Result<(
-    ElectionResult<AccountId32, Perbill>,
-    Vec<PhragmenTrace<AccountId32>>,
+    ElectionResult<AccountId, Perbill>,
+    Vec<PhragmenTrace<AccountId>>,
 )> {
-    match sp_npos_elections::seq_phragmen::<AccountId32, Perbill>(
+    match sp_npos_elections::seq_phragmen::<AccountId, Perbill>(
         inputs.to_elect,
         inputs.candidates,
         inputs.voters,

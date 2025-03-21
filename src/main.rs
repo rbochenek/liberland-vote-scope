@@ -1,11 +1,11 @@
 use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
-use anyhow::Result;
+use anyhow::{Result, bail};
 use clap::Parser;
 use sp_arithmetic::per_things::Perbill;
 use sp_npos_elections::{ElectionResult, PhragmenTrace};
 use std::fs;
 use std::path::PathBuf;
-use subxt::{SubstrateConfig, config::substrate::AccountId32, utils::H256};
+use subxt::{Config, OnlineClient, SubstrateConfig};
 use tracing::{Level, event};
 
 mod markdown;
@@ -22,6 +22,8 @@ use phragmen::*;
 )]
 pub mod substrate {}
 
+pub type AccountId = <SubstrateConfig as Config>::AccountId;
+
 // Command line arguments
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -32,7 +34,7 @@ struct Args {
 
     /// Fetch elections data at given block hash
     #[arg(short, long)]
-    at: Option<<SubstrateConfig as subxt::Config>::Hash>,
+    at: Option<<SubstrateConfig as Config>::Hash>,
 
     /// Increase logging verbosity
     #[arg(short, long, default_value_t = false)]
