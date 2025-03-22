@@ -1,5 +1,5 @@
 use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
-use actix_web::{App, HttpServer, Responder, get};
+use actix_web::{App, HttpServer, Responder, error, get, web};
 use anyhow::{Result, bail};
 use clap::Parser;
 use sp_arithmetic::per_things::Perbill;
@@ -10,7 +10,9 @@ use tracing::{Level, event};
 mod api;
 use api::*;
 mod onchain;
+use onchain::*;
 mod phragmen;
+use phragmen::*;
 mod types;
 use types::*;
 
@@ -21,16 +23,12 @@ use types::*;
 pub mod substrate {}
 
 // Command line arguments
-#[derive(Parser)]
+#[derive(Clone, Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
     /// The node to connect to
     #[arg(short, long, default_value = "wss://liberland-rpc.dwellir.com")]
     uri: String,
-
-    /// Fetch elections data at given block hash
-    #[arg(short, long)]
-    at: Option<<SubstrateConfig as Config>::Hash>,
 
     /// Increase logging verbosity
     #[arg(short, long, default_value_t = false)]
@@ -53,9 +51,13 @@ async fn main() -> std::io::Result<()> {
     tracing::subscriber::set_global_default(subscriber).expect("Default tracing subscriber error");
 
     // Start HTTP server
-    HttpServer::new(|| App::new().service(election))
-        .workers(3)
-        .bind(("0.0.0.0", 8080))?
-        .run()
-        .await
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(args.clone()))
+            .service(election)
+    })
+    .workers(3)
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await
 }

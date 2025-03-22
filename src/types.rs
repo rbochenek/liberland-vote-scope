@@ -1,10 +1,11 @@
 use super::*;
 
+pub type Hash = <SubstrateConfig as Config>::Hash;
 pub type AccountId = <SubstrateConfig as Config>::AccountId;
 
 #[derive(Default, Debug)]
 pub struct ElectionsDataOnChain {
-    pub block_hash: <SubstrateConfig as Config>::Hash,
+    pub block_hash: Hash,
     pub desired_members: u32,
     pub desired_runners_up: u32,
     pub election_rounds: u32,

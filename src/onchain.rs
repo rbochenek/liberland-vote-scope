@@ -1,12 +1,15 @@
 use super::*;
 
-pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDataOnChain> {
+pub async fn download_onchain_elections_data(
+    block_hash: Option<Hash>,
+    args: &Args,
+) -> Result<ElectionsDataOnChain> {
     // Connect to node
     event!(Level::INFO, "Connecting to {}  ", &args.uri);
     let api = OnlineClient::<SubstrateConfig>::from_url(&args.uri).await?;
 
     // Prepare block hash to operate on
-    let block_hash = match args.at {
+    let block_hash = match block_hash {
         Some(hash) => {
             event!(Level::INFO, "Block hash: {:?}  ", hash);
             hash
