@@ -10,16 +10,15 @@ use tracing::{Level, event};
 mod api;
 use api::*;
 mod onchain;
-use onchain::ElectionsDataOnChain;
 mod phragmen;
+mod types;
+use types::*;
 
 #[subxt::subxt(
     runtime_metadata_path = "./artifacts/mainnet.scale",
     derive_for_all_types = "Clone"
 )]
 pub mod substrate {}
-
-pub type AccountId = <SubstrateConfig as Config>::AccountId;
 
 // Command line arguments
 #[derive(Parser)]

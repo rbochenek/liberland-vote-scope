@@ -1,17 +1,5 @@
 use super::*;
 
-#[derive(Default, Debug)]
-pub struct ElectionsDataOnChain {
-    pub block_hash: <SubstrateConfig as Config>::Hash,
-    pub desired_members: u32,
-    pub desired_runners_up: u32,
-    pub election_rounds: u32,
-    pub members: Vec<SeatHolder<AccountId, u128>>,
-    pub runners_up: Vec<SeatHolder<AccountId, u128>>,
-    pub candidates: Vec<(AccountId, u128)>,
-    pub voting: Vec<(AccountId, Voter<AccountId, u128>)>,
-}
-
 pub async fn download_onchain_elections_data(args: &Args) -> Result<ElectionsDataOnChain> {
     // Connect to node
     event!(Level::INFO, "Connecting to {}  ", &args.uri);

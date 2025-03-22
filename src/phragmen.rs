@@ -1,12 +1,5 @@
 use super::*;
 
-#[derive(Default, Debug)]
-pub struct PhragmenInputs {
-    pub to_elect: usize,
-    pub candidates: Vec<AccountId>,
-    pub voters: Vec<(AccountId, u64, Vec<AccountId>)>,
-}
-
 pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<PhragmenInputs> {
     // Collect all Candidates (including current Members and RunnersUp)
     let mut members_and_runnersup = onchain
