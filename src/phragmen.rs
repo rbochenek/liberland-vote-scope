@@ -17,8 +17,9 @@ pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<Phragme
     candidates_and_deposits.append(&mut members_and_runnersup);
 
     // Calculate number of candidates to elect
-    // TODO: Add CLI argument for `MaxMembers` and `MaxRunnersUp`
-    let to_elect = 14;
+    let to_elect = onchain
+        .desired_members
+        .saturating_add(onchain.desired_runners_up) as usize;
 
     // Collect Candidate IDs
     let candidate_ids = candidates_and_deposits
