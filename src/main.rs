@@ -9,7 +9,6 @@ use tracing::{Level, event};
 
 mod api;
 use api::*;
-mod markdown;
 mod onchain;
 use onchain::ElectionsDataOnChain;
 mod phragmen;
