@@ -5,18 +5,17 @@ pub async fn download_onchain_elections_data(
     args: &Args,
 ) -> Result<ElectionsDataOnChain> {
     // Connect to node
-    event!(Level::INFO, "Connecting to {}  ", &args.uri);
     let api = OnlineClient::<SubstrateConfig>::from_url(&args.uri).await?;
 
     // Prepare block hash to operate on
     let block_hash = match block_hash {
         Some(hash) => {
-            event!(Level::INFO, "Block hash: {:?}  ", hash);
+            event!(Level::DEBUG, "Block hash: {:?}  ", hash);
             hash
         }
         None => {
             let latest_block_hash = api.blocks().at_latest().await?.hash();
-            event!(Level::INFO, "Latest block hash: {:?}  ", latest_block_hash);
+            event!(Level::DEBUG, "Latest block hash: {:?}  ", latest_block_hash);
             latest_block_hash
         }
     };
@@ -28,12 +27,6 @@ pub async fn download_onchain_elections_data(
     let desired_runners_up = api
         .constants()
         .at(&substrate::constants().elections().desired_runners_up())?;
-    event!(
-        Level::INFO,
-        "DesiredMembers = {}, DesiredRunnersUp = {}",
-        desired_members,
-        desired_runners_up
-    );
 
     // Fetch Elections data
     let storage = api.storage().at(block_hash);
