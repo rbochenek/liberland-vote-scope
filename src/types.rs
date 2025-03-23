@@ -15,7 +15,7 @@ pub struct ElectionsDataOnChain {
     pub voting: Vec<(AccountId, Voter<AccountId, u128>)>,
 }
 
-#[derive(Default, Debug)]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
 pub struct PhragmenInputs {
     pub to_elect: usize,
     pub candidates: Vec<AccountId>,

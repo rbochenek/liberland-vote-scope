@@ -18,9 +18,8 @@ async fn election(
         .map_err(|_| error::ErrorBadRequest("Error preparing Phragmen inputs"))?;
 
     // Run Phragmen
-    let (election_results, _phragmen_traces) = run_phragmen(phragmen_inputs)
+    let (_election_results, _phragmen_traces) = run_phragmen(phragmen_inputs.clone())
         .map_err(|_| error::ErrorBadRequest("Phragmen computation error"))?;
 
-    // TODO: serialize results proper JSON format
-    Ok(format!("{:?}", election_results))
+    Ok(web::Json(phragmen_inputs))
 }

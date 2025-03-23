@@ -2,6 +2,7 @@ use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Vot
 use actix_web::{App, HttpServer, Responder, error, get, web};
 use anyhow::{Result, bail};
 use clap::Parser;
+use serde::{Deserialize, Serialize};
 use sp_arithmetic::per_things::Perbill;
 use sp_npos_elections::{ElectionResult, PhragmenTrace};
 use subxt::{Config, OnlineClient, SubstrateConfig};

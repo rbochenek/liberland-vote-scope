@@ -2394,6 +2394,7 @@ dependencies = [
  "anyhow",
  "clap",
  "hex",
+ "serde",
  "sp-arithmetic",
  "sp-npos-elections",
  "subxt",
