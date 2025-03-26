@@ -47,6 +47,7 @@ pub fn run_phragmen(
     inputs: PhragmenInputs,
 ) -> Result<(
     ElectionResult<AccountId, Perbill>,
+    Vec<CandidatePtr<AccountId>>,
     Vec<PhragmenTrace<AccountId>>,
 )> {
     match sp_npos_elections::seq_phragmen::<AccountId, Perbill>(
@@ -55,7 +56,7 @@ pub fn run_phragmen(
         inputs.voters,
         None,
     ) {
-        Ok((results, tracing)) => Ok((results, tracing)),
+        Ok((results, candidates, tracing)) => Ok((results, candidates, tracing)),
         Err(_) => {
             bail!("seq_phragmen() normalization error");
         }

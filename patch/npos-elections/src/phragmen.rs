@@ -73,7 +73,7 @@ pub fn seq_phragmen<AccountId: IdentifierT, P: PerThing128>(
 	candidates: Vec<AccountId>,
 	voters: Vec<(AccountId, VoteWeight, impl IntoIterator<Item = AccountId>)>,
 	balancing: Option<BalancingConfig>,
-) -> Result<(ElectionResult<AccountId, P>, Vec<PhragmenTrace<AccountId>>), crate::Error> {
+) -> Result<(ElectionResult<AccountId, P>, Vec<CandidatePtr<AccountId>>, Vec<PhragmenTrace<AccountId>>), crate::Error> {
 	let (candidates, voters) = setup_inputs(candidates, voters);
 
 	let (candidates, mut voters, tracing) = seq_phragmen_core::<AccountId>(to_elect, candidates, voters)?;
@@ -84,7 +84,7 @@ pub fn seq_phragmen<AccountId: IdentifierT, P: PerThing128>(
 		let _iters = balancing::balance::<AccountId>(&mut voters, config);
 	}
 
-	let mut winners = candidates
+	let mut winners = candidates.clone()
 		.into_iter()
 		.filter(|c_ptr| c_ptr.borrow().elected)
 		// defensive only: seq-phragmen-core returns only up to rounds.
@@ -104,7 +104,7 @@ pub fn seq_phragmen<AccountId: IdentifierT, P: PerThing128>(
 		.map(|w_ptr| (w_ptr.borrow().who.clone(), w_ptr.borrow().backed_stake))
 		.collect();
 
-	Ok((ElectionResult { winners, assignments }, tracing))
+	Ok((ElectionResult { winners, assignments }, candidates, tracing))
 }
 
 /// Core implementation of seq-phragmen.
