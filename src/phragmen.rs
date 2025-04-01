@@ -1,6 +1,17 @@
 use super::*;
+use actix_web::Result;
 
-pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<PhragmenInputs> {
+pub fn simulate_weighted_phragmen_elections(
+    onchain_data: &OnchainElectionsData,
+) -> Result<PhragmenOutputs> {
+    // Convert on-chain data to Phragmen inputs
+    let phragmen_inputs = prepare_phragmen_inputs(&onchain_data);
+
+    // Run Phragmen
+    run_phragmen(phragmen_inputs)
+}
+
+pub fn prepare_phragmen_inputs(onchain: &OnchainElectionsData) -> PhragmenInputs {
     // Collect all Candidates (including current Members and RunnersUp)
     let mut members_and_runnersup = onchain
         .members
@@ -36,29 +47,25 @@ pub fn prepare_phragmen_inputs(onchain: &ElectionsDataOnChain) -> Result<Phragme
         .map(|(voter, Voter { stake, votes, .. })| (voter, stake as u64, votes))
         .collect::<Vec<_>>();
 
-    Ok(PhragmenInputs {
+    PhragmenInputs {
         to_elect,
         candidates: candidate_ids,
         voters,
-    })
+    }
 }
 
-pub fn run_phragmen(
-    inputs: PhragmenInputs,
-) -> Result<(
-    ElectionResult<AccountId, Perbill>,
-    Vec<CandidatePtr<AccountId>>,
-    Vec<PhragmenTrace<AccountId>>,
-)> {
+pub fn run_phragmen(inputs: PhragmenInputs) -> Result<PhragmenOutputs> {
     match sp_npos_elections::seq_phragmen::<AccountId, Perbill>(
         inputs.to_elect,
         inputs.candidates,
         inputs.voters,
         None,
     ) {
-        Ok((results, candidates, tracing)) => Ok((results, candidates, tracing)),
-        Err(_) => {
-            bail!("seq_phragmen() normalization error");
-        }
+        Ok((result, candidates, traces)) => Ok(PhragmenOutputs {
+            result,
+            candidates,
+            traces,
+        }),
+        Err(_) => Err(error::ErrorBadRequest("Phragmen internal error")),
     }
 }

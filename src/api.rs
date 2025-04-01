@@ -1,49 +1,32 @@
 use super::*;
 use actix_web::Result;
 
-#[get("/elections/latest")]
-async fn election_latest(args: web::Data<Args>) -> Result<impl Responder, error::Error> {
-    let results = fetch_election_results(None, &args).await?;
-
-    Ok(web::Json(results))
-}
-
-#[get("/elections/{block_hash}")]
-async fn election(
-    path: web::Path<Hash>,
-    args: web::Data<Args>,
-) -> Result<impl Responder, error::Error> {
-    let block_hash = path.into_inner();
-
-    let results = fetch_election_results(Some(block_hash), &args).await?;
-
-    Ok(web::Json(results))
-}
-
-async fn fetch_election_results(
-    block_hash: Option<Hash>,
-    args: &Args,
-) -> Result<ApiElectionResults> {
-    // Download on-chain data
-    let onchain_data = download_onchain_elections_data(block_hash, args)
+#[get("/council/elections/latest")]
+async fn council_elections_latest(
+    onchain: web::Data<OnchainDataProvider<SubstrateConfig>>,
+) -> Result<impl Responder> {
+    let onchain_data = onchain
+        .elections_at_blockhash(None)
         .await
-        .map_err(|_| error::ErrorBadRequest("Error downloading on-chain data"))?;
+        .map_err(|_| error::ErrorBadRequest("Error downloading on-chain elections data"))?;
+    let phragmen = simulate_weighted_phragmen_elections(&onchain_data)?;
+    let result = ApiElectionResults::build_from(&onchain_data, &phragmen);
 
-    // Convert on-chain data to Phragmen inputs
-    let phragmen_inputs = prepare_phragmen_inputs(&onchain_data)
-        .map_err(|_| error::ErrorBadRequest("Error preparing Phragmen inputs"))?;
+    Ok(web::Json(result))
+}
 
-    // Run Phragmen
-    let (election_results, candidates, phragmen_traces) = run_phragmen(phragmen_inputs.clone())
-        .map_err(|_| error::ErrorBadRequest("Phragmen computation error"))?;
+#[get("/council/elections/{block_hash}")]
+async fn council_elections_at_blockhash(
+    path: web::Path<Hash>,
+    onchain: web::Data<OnchainDataProvider<SubstrateConfig>>,
+) -> Result<impl Responder> {
+    let block_hash = path.into_inner();
+    let onchain_data = onchain
+        .elections_at_blockhash(Some(block_hash))
+        .await
+        .map_err(|_| error::ErrorBadRequest("Error downloading on-chain elections data"))?;
+    let phragmen = simulate_weighted_phragmen_elections(&onchain_data)?;
+    let result = ApiElectionResults::build_from(&onchain_data, &phragmen);
 
-    // Generate JSON response with election data
-    let results = ApiElectionResults::build_from(
-        &onchain_data,
-        &election_results,
-        &candidates,
-        &phragmen_traces,
-    );
-
-    Ok(results)
+    Ok(web::Json(result))
 }

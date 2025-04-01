@@ -3,9 +3,9 @@ use super::*;
 pub type Hash = <SubstrateConfig as Config>::Hash;
 pub type AccountId = <SubstrateConfig as Config>::AccountId;
 
-/// Elections data downloaded from blockchain
+/// Elections data downloaded from the chain
 #[derive(Default, Debug)]
-pub struct ElectionsDataOnChain {
+pub struct OnchainElectionsData {
     pub block_hash: Hash,
     pub desired_members: u32,
     pub desired_runners_up: u32,
@@ -22,6 +22,12 @@ pub struct PhragmenInputs {
     pub to_elect: usize,
     pub candidates: Vec<AccountId>,
     pub voters: Vec<(AccountId, u64, Vec<AccountId>)>,
+}
+
+pub struct PhragmenOutputs {
+    pub result: ElectionResult<AccountId, Perbill>,
+    pub candidates: Vec<CandidatePtr<AccountId>>,
+    pub traces: Vec<PhragmenTrace<AccountId>>,
 }
 
 /// API response for election results
@@ -159,21 +165,15 @@ pub struct ApiVoteDistribution {
 /// Helper methods for building API response
 impl ApiElectionResults {
     /// Build API response from internal data structures
-    pub fn build_from(
-        on_chain: &ElectionsDataOnChain,
-        _result: &ElectionResult<AccountId, Perbill>,
-        candidates_all: &Vec<CandidatePtr<AccountId>>,
-        _traces: &Vec<PhragmenTrace<AccountId>>,
-        // identity_provider: &impl IdentityProvider,
-    ) -> Self {
+    pub fn build_from(onchain: &OnchainElectionsData, phragmen: &PhragmenOutputs) -> Self {
         // 1. Build council seats
         let council_seats = ApiCouncilSeats {
-            members: on_chain.desired_members,
-            runners_up: on_chain.desired_runners_up,
+            members: onchain.desired_members,
+            runners_up: onchain.desired_runners_up,
         };
 
         // 2. Process candidates
-        let members: Vec<ApiCandidate> = on_chain
+        let members: Vec<ApiCandidate> = onchain
             .members
             .iter()
             .map(|seat_holder| ApiCandidate {
@@ -182,7 +182,7 @@ impl ApiElectionResults {
                 initial_stake: seat_holder.stake,
             })
             .collect();
-        let mut runners_up: Vec<ApiCandidate> = on_chain
+        let mut runners_up: Vec<ApiCandidate> = onchain
             .runners_up
             .iter()
             .map(|seat_holder| ApiCandidate {
@@ -190,7 +190,7 @@ impl ApiElectionResults {
                 initial_stake: seat_holder.stake,
             })
             .collect();
-        let mut other_candidates: Vec<ApiCandidate> = on_chain
+        let mut other_candidates: Vec<ApiCandidate> = onchain
             .candidates
             .iter()
             .map(|(account_id, stake)| ApiCandidate {
@@ -203,7 +203,7 @@ impl ApiElectionResults {
         candidates.append(&mut other_candidates);
 
         // 3. Process voters
-        let voters: Vec<ApiVoter> = on_chain
+        let voters: Vec<ApiVoter> = onchain
             .voting
             .iter()
             .map(|(account_id, voter)| ApiVoter {
@@ -235,7 +235,8 @@ impl ApiElectionResults {
         //     // ...
         // };
 
-        let mut elected_candidates: Vec<CandidatePtr<AccountId>> = candidates_all
+        let mut elected_candidates: Vec<CandidatePtr<AccountId>> = phragmen
+            .candidates
             .clone()
             .into_iter()
             .filter(|c_ptr| c_ptr.borrow().elected)
@@ -264,7 +265,8 @@ impl ApiElectionResults {
             })
             .collect();
 
-        let not_elected_candidates: Vec<CandidatePtr<AccountId>> = candidates_all
+        let not_elected_candidates: Vec<CandidatePtr<AccountId>> = phragmen
+            .candidates
             .clone()
             .into_iter()
             .filter(|c_ptr| !c_ptr.borrow().elected)
@@ -290,7 +292,7 @@ impl ApiElectionResults {
 
         // 7. Construct the final response
         Self {
-            block_hash: on_chain.block_hash.to_string(),
+            block_hash: onchain.block_hash.to_string(),
             election_data: ApiElectionData {
                 council_seats,
                 final_results,
@@ -303,10 +305,10 @@ impl ApiElectionResults {
 }
 
 /// Trait for identity provider implementations
-pub trait IdentityProvider {
-    /// Get display name for an account, if available
-    fn get_display_name(&self, account: &AccountId) -> Option<String>;
-}
+// pub trait IdentityProvider {
+/// Get display name for an account, if available
+//     fn get_display_name(&self, account: &AccountId) -> Option<String>;
+// }
 
 /// Helper for converting AccountId to ApiAccount
 impl From<&AccountId> for ApiAccount {
@@ -319,13 +321,13 @@ impl From<&AccountId> for ApiAccount {
     }
 }
 
-/// Helper for converting AccountId to ApiAccount with identity lookup
-pub fn account_with_identity(
-    account: &AccountId,
-    identity_provider: &impl IdentityProvider,
-) -> ApiAccount {
-    ApiAccount {
-        address: account.to_string(),
-        display_name: identity_provider.get_display_name(account),
-    }
-}
+// Helper for converting AccountId to ApiAccount with identity lookup
+// pub fn account_with_identity(
+//     account: &AccountId,
+//     identity_provider: &impl IdentityProvider,
+// ) -> ApiAccount {
+//     ApiAccount {
+//         address: account.to_string(),
+//         display_name: identity_provider.get_display_name(account),
+//     }
+// }

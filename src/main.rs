@@ -1,6 +1,6 @@
 use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
 use actix_web::{App, HttpServer, Responder, error, get, web};
-use anyhow::{Result, bail};
+use anyhow::Result;
 use clap::Parser;
 use serde::{Deserialize, Serialize};
 use sp_arithmetic::per_things::Perbill;
@@ -14,6 +14,8 @@ mod onchain;
 use onchain::*;
 mod phragmen;
 use phragmen::*;
+mod traits;
+use traits::*;
 mod types;
 use types::*;
 
@@ -29,7 +31,7 @@ pub mod substrate {}
 struct Args {
     /// The node to connect to
     #[arg(short, long, default_value = "wss://liberland-rpc.dwellir.com")]
-    uri: String,
+    url: String,
 
     /// Increase logging verbosity
     #[arg(short, long, default_value_t = false)]
@@ -51,12 +53,18 @@ async fn main() -> std::io::Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("Default tracing subscriber error");
 
+    // Shared state
+    let onchain_data_provider: OnchainDataProvider<SubstrateConfig> =
+        OnchainDataProvider::new(&args.url)
+            .await
+            .expect("Error creating OnchainDataProvider");
+
     // Start HTTP server
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(args.clone()))
-            .service(election_latest)
-            .service(election)
+            .app_data(web::Data::new(onchain_data_provider.clone()))
+            .service(council_elections_latest)
+            .service(council_elections_at_blockhash)
     })
     .workers(3)
     .bind(("0.0.0.0", 8080))?
