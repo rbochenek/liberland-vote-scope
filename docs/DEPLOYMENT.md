@@ -1,4 +1,4 @@
-# Deplying backend and frontend (docker)
+# Deploying backend and frontend (docker)
 
 ## Create docker network for backend <-> frontend communication
 
@@ -12,6 +12,7 @@ docker network create liberland-vote-scope
 
 ```sh
 git clone https://github.com/rbochenek/liberland-vote-scope
+cd liberland-vote-scope
 ```
 
 2. Build docker image
@@ -32,6 +33,7 @@ docker run -d --network liberland-vote-scope --name liberland-vote-scope --resta
 
 ```sh
 git clone https://github.com/rbochenek/liberland-vote-scope-frontend.git
+cd liberland-vote-scope-frontend
 ```
 
 2. Build docker image
