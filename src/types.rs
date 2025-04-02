@@ -143,7 +143,7 @@ pub struct ApiRound {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ApiCandidateScore {
     /// Candidate account
-    pub candidate: ApiAccount,
+    pub id: ApiAccount,
     /// Score in this round
     pub score: f64,
     /// Role in final election (for consistent coloring)
@@ -166,13 +166,13 @@ pub struct ApiVoteDistribution {
 impl ApiElectionResults {
     /// Build API response from internal data structures
     pub fn build_from(onchain: &OnchainElectionsData, phragmen: &PhragmenOutputs) -> Self {
-        // 1. Build council seats
+        // Build council seats
         let council_seats = ApiCouncilSeats {
             members: onchain.desired_members,
             runners_up: onchain.desired_runners_up,
         };
 
-        // 2. Process candidates
+        // Process candidates
         let members: Vec<ApiCandidate> = onchain
             .members
             .iter()
@@ -202,7 +202,7 @@ impl ApiElectionResults {
         candidates.append(&mut runners_up);
         candidates.append(&mut other_candidates);
 
-        // 3. Process voters
+        // Process voters
         let voters: Vec<ApiVoter> = onchain
             .voting
             .iter()
@@ -214,6 +214,7 @@ impl ApiElectionResults {
             })
             .collect();
 
+        // TODO: build roles map
         // 4. Build roles map
         // let mut role_map: HashMap<AccountId, String> = HashMap::new();
         // for (idx, account) in on_chain.members.iter().enumerate() {
@@ -234,7 +235,31 @@ impl ApiElectionResults {
         //     // from on_chain data to get the complete picture
         //     // ...
         // };
+        //
 
+        // Build rounds map
+        // TODO: map roles
+        let mut rounds: Vec<ApiRound> = Vec::new();
+        for trace in &phragmen.traces {
+            if let PhragmenTrace::RoundEnd(round_number, candidates, _) = trace {
+                let scores = candidates
+                    .clone()
+                    .into_iter()
+                    .map(|c_ptr| ApiCandidateScore {
+                        id: ApiAccount::from(&c_ptr.who),
+                        score: c_ptr.score.n() as f64 / c_ptr.score.d() as f64,
+                        role: ApiCandidateRole::NotElected,
+                    })
+                    .collect();
+                rounds.push(ApiRound {
+                    round_number: *round_number,
+                    scores,
+                    vote_distribution: vec![],
+                });
+            }
+        }
+
+        // Build final results
         let mut elected_candidates: Vec<CandidatePtr<AccountId>> = phragmen
             .candidates
             .clone()
@@ -286,11 +311,6 @@ impl ApiElectionResults {
         final_results.append(&mut elected_runners_up);
         final_results.append(&mut not_elected_candidates);
 
-        // 6. Process traces to build rounds
-        // let rounds = process_traces(traces, &role_map, identity_provider);
-        let rounds = Default::default();
-
-        // 7. Construct the final response
         Self {
             block_hash: onchain.block_hash.to_string(),
             election_data: ApiElectionData {
