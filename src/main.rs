@@ -1,20 +1,23 @@
 use crate::substrate::runtime_types::pallet_elections_phragmen::{SeatHolder, Voter};
-use anyhow::{Result, bail};
+use actix_web::{App, HttpServer, Responder, error, get, web};
+use anyhow::Result;
 use clap::Parser;
+use serde::{Deserialize, Serialize};
 use sp_arithmetic::per_things::Perbill;
-use sp_npos_elections::{ElectionResult, PhragmenTrace};
-use std::fs;
-use std::path::PathBuf;
+use sp_npos_elections::{CandidatePtr, ElectionResult, PhragmenTrace};
 use subxt::{Config, OnlineClient, SubstrateConfig};
 use tracing::{Level, event};
 
-mod markdown;
-use markdown::generate_elections_report;
+mod api;
+use api::*;
 mod onchain;
-use onchain::ElectionsDataOnChain;
-use onchain::download_onchain_elections_data;
+use onchain::*;
 mod phragmen;
 use phragmen::*;
+mod traits;
+use traits::*;
+mod types;
+use types::*;
 
 #[subxt::subxt(
     runtime_metadata_path = "./artifacts/mainnet.scale",
@@ -22,31 +25,21 @@ use phragmen::*;
 )]
 pub mod substrate {}
 
-pub type AccountId = <SubstrateConfig as Config>::AccountId;
-
 // Command line arguments
-#[derive(Parser)]
+#[derive(Clone, Parser)]
 #[command(version, about, long_about = None)]
 struct Args {
     /// The node to connect to
     #[arg(short, long, default_value = "wss://liberland-rpc.dwellir.com")]
-    uri: String,
-
-    /// Fetch elections data at given block hash
-    #[arg(short, long)]
-    at: Option<<SubstrateConfig as Config>::Hash>,
+    url: String,
 
     /// Increase logging verbosity
     #[arg(short, long, default_value_t = false)]
     verbose: bool,
-
-    /// Path to save elections report to
-    #[arg(short, long)]
-    output: Option<PathBuf>,
 }
 
-#[tokio::main]
-async fn main() -> Result<()> {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     // Parse command line arguments
     let args = Args::parse();
 
@@ -60,32 +53,21 @@ async fn main() -> Result<()> {
         .finish();
     tracing::subscriber::set_global_default(subscriber).expect("Default tracing subscriber error");
 
-    // Download on-chain Elections data
-    let onchain = download_onchain_elections_data(&args).await?;
+    // Shared state
+    let onchain_data_provider: OnchainDataProvider<SubstrateConfig> =
+        OnchainDataProvider::new(&args.url)
+            .await
+            .expect("Error creating OnchainDataProvider");
 
-    // Prepare Phragmen inputs
-    let phragmen_inputs = prepare_phragmen_inputs(&onchain)?;
-
-    // Run Phragmen
-    let (phragmen_results, phragmen_tracing) = run_phragmen(phragmen_inputs)?;
-
-    // Generate elections report
-    let report = generate_elections_report(&onchain, &phragmen_results, &phragmen_tracing);
-
-    // (optional) Save elections report
-    if let Some(path) = args.output {
-        event!(
-            Level::INFO,
-            "Saving elections report to: {}",
-            path.display()
-        );
-        fs::write(path, report).expect("Error saving elections report");
-    } else {
-        event!(
-            Level::WARN,
-            "No output file specified (see `--output`), discarding generated data."
-        );
-    }
-
-    Ok(())
+    // Start HTTP server
+    HttpServer::new(move || {
+        App::new()
+            .app_data(web::Data::new(onchain_data_provider.clone()))
+            .service(council_elections_latest)
+            .service(council_elections_at_blockhash)
+    })
+    .workers(3)
+    .bind(("0.0.0.0", 8080))?
+    .run()
+    .await
 }
