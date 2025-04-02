@@ -216,6 +216,8 @@ pub fn seq_phragmen_core<AccountId: IdentifierT>(
 		} else {
 			break
 		}
+
+		tracing.push(PhragmenTrace::RoundEnd(round,candidates.iter().map(|c_ptr| c_ptr.borrow().clone()).collect(), voters.clone() ))
 	}
 
 	// update backing stake of candidates and voters

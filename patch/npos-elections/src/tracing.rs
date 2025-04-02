@@ -40,6 +40,7 @@ pub enum PhragmenTrace<AccountId> {
     Finish,
     ToElect(usize),
     RoundStart(usize, Candidates<AccountId>, Voters<AccountId>),
+    RoundEnd(usize, Candidates<AccountId>, Voters<AccountId>),
     ComputeCandidateScores,
     IncCandidateScoresByVoters,
     CandidateScoresCalculated(Candidates<AccountId>),
