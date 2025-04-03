@@ -1,4 +1,6 @@
 use super::*;
+use std::collections::HashMap;
+use std::str::FromStr;
 
 #[derive(Clone)]
 pub struct OnchainDataProvider<C: Config> {
@@ -90,5 +92,103 @@ impl OnchainElectionsDataProvider for OnchainDataProvider<SubstrateConfig> {
             candidates,
             voting,
         })
+    }
+}
+
+impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
+    async fn map_elections_identities(&self, elections: &mut ApiElectionResults) -> Result<()> {
+        use substrate::runtime_types::pallet_identity::types::Data;
+
+        // TODO: This would really benefit from cache shared among all workers
+
+        // ApiAccount's with resolved names
+        let mut resolved: HashMap<String, String> = HashMap::new();
+
+        // Resolve candidates
+        for candidate in &elections.election_data.final_results {
+            let account = subxt::utils::AccountId32::from_str(&candidate.id.address)?;
+            let storage = substrate::storage().identity().identity_of(&account);
+
+            let resp = self
+                .api
+                .storage()
+                .at_latest()
+                .await?
+                .fetch(&storage)
+                .await?;
+
+            if let Some(identity) = resp {
+                let display_name = match identity.info.display {
+                    Data::Raw1(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw2(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw3(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw4(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw5(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw6(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw7(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw8(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw9(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw10(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw11(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw12(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw13(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw14(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw15(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw16(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw17(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw18(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw19(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw20(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw21(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw22(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw23(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw24(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw25(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw26(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw27(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw28(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw29(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw30(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw31(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    Data::Raw32(raw_vec) => String::from_utf8(raw_vec.to_vec())?,
+                    _ => {
+                        event!(
+                            Level::WARN,
+                            "display name not recognized for address {}: {:?}",
+                            candidate.id.address,
+                            identity.info.display
+                        );
+                        continue;
+                    }
+                };
+
+                resolved.insert(candidate.id.address.clone(), display_name);
+            }
+        }
+
+        // Map candidate names in final_results
+        for candidate in elections.election_data.final_results.iter_mut() {
+            if let Some(display_name) = resolved.get(&candidate.id.address) {
+                candidate.id.display_name = Some(display_name.clone());
+            }
+        }
+
+        // Map candidate names in candidates
+        for candidate in elections.election_data.candidates.iter_mut() {
+            if let Some(display_name) = resolved.get(&candidate.id.address) {
+                candidate.id.display_name = Some(display_name.clone());
+            }
+        }
+
+        // Map candidate names in rounds.scores
+        for round in elections.election_data.rounds.iter_mut() {
+            for candidate in round.scores.iter_mut() {
+                if let Some(display_name) = resolved.get(&candidate.id.address) {
+                    candidate.id.display_name = Some(display_name.clone());
+                }
+            }
+        }
+
+        Ok(())
     }
 }

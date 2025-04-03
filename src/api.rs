@@ -10,7 +10,13 @@ async fn council_elections_latest(
         .await
         .map_err(|_| error::ErrorBadRequest("Error downloading on-chain elections data"))?;
     let phragmen = simulate_weighted_phragmen_elections(&onchain_data)?;
-    let result = ApiElectionResults::build_from(&onchain_data, &phragmen);
+    let mut result = ApiElectionResults::build_from(&onchain_data, &phragmen);
+
+    // Map addresses to identities
+    onchain
+        .map_elections_identities(&mut result)
+        .await
+        .map_err(|_| error::ErrorBadRequest("Error mapping addresses to identites"))?;
 
     Ok(web::Json(result))
 }
@@ -26,7 +32,13 @@ async fn council_elections_at_blockhash(
         .await
         .map_err(|_| error::ErrorBadRequest("Error downloading on-chain elections data"))?;
     let phragmen = simulate_weighted_phragmen_elections(&onchain_data)?;
-    let result = ApiElectionResults::build_from(&onchain_data, &phragmen);
+    let mut result = ApiElectionResults::build_from(&onchain_data, &phragmen);
+
+    // Map addresses to identities
+    onchain
+        .map_elections_identities(&mut result)
+        .await
+        .map_err(|_| error::ErrorBadRequest("Error mapping addresses to identites"))?;
 
     Ok(web::Json(result))
 }

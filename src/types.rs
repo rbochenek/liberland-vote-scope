@@ -241,14 +241,24 @@ impl ApiElectionResults {
         // TODO: map roles
         let mut rounds: Vec<ApiRound> = Vec::new();
         for trace in &phragmen.traces {
-            if let PhragmenTrace::RoundEnd(round_number, candidates, _) = trace {
+            if let PhragmenTrace::RoundStart(round_number, candidates, _) = trace {
                 let scores = candidates
                     .clone()
                     .into_iter()
                     .map(|c_ptr| ApiCandidateScore {
                         id: ApiAccount::from(&c_ptr.who),
                         score: c_ptr.score.n() as f64 / c_ptr.score.d() as f64,
-                        role: ApiCandidateRole::NotElected,
+                        role: {
+                            if c_ptr.elected {
+                                if c_ptr.round < onchain.desired_members as usize {
+                                    ApiCandidateRole::Member
+                                } else {
+                                    ApiCandidateRole::RunnerUp
+                                }
+                            } else {
+                                ApiCandidateRole::NotElected
+                            }
+                        },
                     })
                     .collect();
                 rounds.push(ApiRound {
