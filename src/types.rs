@@ -322,7 +322,7 @@ impl ApiElectionResults {
         final_results.append(&mut not_elected_candidates);
 
         Self {
-            block_hash: onchain.block_hash.to_string(),
+            block_hash: format!("{:?}", onchain.block_hash),
             election_data: ApiElectionData {
                 council_seats,
                 final_results,
@@ -334,12 +334,6 @@ impl ApiElectionResults {
     }
 }
 
-/// Trait for identity provider implementations
-// pub trait IdentityProvider {
-/// Get display name for an account, if available
-//     fn get_display_name(&self, account: &AccountId) -> Option<String>;
-// }
-
 /// Helper for converting AccountId to ApiAccount
 impl From<&AccountId> for ApiAccount {
     fn from(account: &AccountId) -> Self {
@@ -350,14 +344,3 @@ impl From<&AccountId> for ApiAccount {
         }
     }
 }
-
-// Helper for converting AccountId to ApiAccount with identity lookup
-// pub fn account_with_identity(
-//     account: &AccountId,
-//     identity_provider: &impl IdentityProvider,
-// ) -> ApiAccount {
-//     ApiAccount {
-//         address: account.to_string(),
-//         display_name: identity_provider.get_display_name(account),
-//     }
-// }
