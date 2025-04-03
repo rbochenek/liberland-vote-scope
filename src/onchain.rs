@@ -180,6 +180,15 @@ impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
             }
         }
 
+        // Map candidates in voters
+        for voter in elections.election_data.voters.iter_mut() {
+            for candidate in &mut voter.votes {
+                if let Some(display_name) = resolved.get(&candidate.address) {
+                    candidate.display_name = Some(display_name.clone());
+                }
+            }
+        }
+
         // Map candidate names in rounds.scores
         for round in elections.election_data.rounds.iter_mut() {
             for candidate in round.scores.iter_mut() {
