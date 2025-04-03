@@ -1,3 +1,6 @@
-Last elections at block hash `f5ed41e1b0bc9dcfa4926250ee8aeef3e7d498b4c884589d3c570820d45c35ee`.
-Previous block hash: 1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d
-Next block hash: cf06399b3f83171ebb8a7c9cd65d3afed9ff20a22df5f1ee13ae461728a310ce
+# Council Elections
+
+| Date / Time (UTC)   | Block Number | Block Hash                                                         | Previous Block Hash                                                |
+| ------------------- | ------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| 2025-01-04T06:39:30 | 9072000      | `f5ed41e1b0bc9dcfa4926250ee8aeef3e7d498b4c884589d3c570820d45c35ee` | `1b983f5466bdf8675ddace127e48f809ea899246cb99d7a78d067d4a7e1de27d` |
+| 2024-10-06T03:15:00 | ---          | `72ae7b8bd1e828cfaf7359da593a92d6832136f2bf30ca530a35957ea1fe2617` | `ce1340408a761819190580e7f6293a570502d567ebc84bedd0936b514325752c` |
