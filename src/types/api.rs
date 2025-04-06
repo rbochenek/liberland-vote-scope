@@ -1,46 +1,5 @@
 use super::*;
 
-pub type Hash = <SubstrateConfig as Config>::Hash;
-pub type AccountId = <SubstrateConfig as Config>::AccountId;
-
-/// Elections data downloaded from the chain
-#[derive(Default, Debug)]
-pub struct OnchainElectionsData {
-    pub block_hash: Hash,
-    pub desired_members: u32,
-    pub desired_runners_up: u32,
-    pub election_rounds: u32,
-    pub members: Vec<SeatHolder<AccountId, u128>>,
-    pub runners_up: Vec<SeatHolder<AccountId, u128>>,
-    pub candidates: Vec<(AccountId, u128)>,
-    pub voting: Vec<(AccountId, Voter<AccountId, u128>)>,
-}
-
-/// Intermediate representation used by Phragmen
-#[derive(Clone, Default, Debug, Serialize, Deserialize)]
-pub struct PhragmenInputs {
-    pub to_elect: usize,
-    pub candidates: Vec<AccountId>,
-    pub voters: Vec<(AccountId, u64, Vec<AccountId>)>,
-}
-
-pub struct PhragmenOutputs {
-    pub result: ElectionResult<AccountId, Perbill>,
-    pub candidates: Vec<CandidatePtr<AccountId>>,
-    pub traces: Vec<PhragmenTrace<AccountId>>,
-}
-
-/// API response for election results
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ApiElectionResults {
-    /// Block hash where this election data was taken from
-    #[serde(rename = "blockHash")]
-    pub block_hash: String,
-    /// Complete election data
-    #[serde(rename = "electionData")]
-    pub election_data: ApiElectionData,
-}
-
 /// Account data with optional display name
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ApiAccount {
@@ -55,6 +14,12 @@ pub struct ApiAccount {
 /// Complete election data
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ApiElectionData {
+    /// Block hash where this election data was taken from
+    #[serde(rename = "blockHash")]
+    pub block_hash: String,
+    /// Number of elections commenced so far
+    #[serde(rename = "electionRounds")]
+    pub election_rounds: u32,
     /// Council configuration
     #[serde(rename = "councilSeats")]
     pub council_seats: ApiCouncilSeats,
@@ -163,7 +128,7 @@ pub struct ApiVoteDistribution {
 }
 
 /// Helper methods for building API response
-impl ApiElectionResults {
+impl ApiElectionData {
     /// Build API response from internal data structures
     pub fn build_from(onchain: &OnchainElectionsData, phragmen: &PhragmenOutputs) -> Self {
         // Build council seats
@@ -207,38 +172,13 @@ impl ApiElectionResults {
             .voting
             .iter()
             .map(|(account_id, voter)| ApiVoter {
-                // id: account_with_identity(account_id, identity_provider),
                 id: ApiAccount::from(account_id),
                 stake: voter.stake, // Adjust based on your Voter structure
                 votes: voter.votes.iter().map(ApiAccount::from).collect(),
             })
             .collect();
 
-        // TODO: build roles map
-        // 4. Build roles map
-        // let mut role_map: HashMap<AccountId, String> = HashMap::new();
-        // for (idx, account) in on_chain.members.iter().enumerate() {
-        //     role_map.insert(account.clone(), "Member".to_string());
-        // }
-        // for (idx, (account, _)) in on_chain.runners_up.iter().enumerate() {
-        //     role_map.insert(account.clone(), "RunnerUp".to_string());
-        // }
-        // for (account, _) in on_chain.candidates.iter() {
-        //     if !role_map.contains_key(account) {
-        //         role_map.insert(account.clone(), "NotElected".to_string());
-        //     }
-        // }
-
-        // 5. Process final results
-        // let final_results: Vec<ApiCandidateResult> = {
-        //     // Combine winners from the election result with members and runners_up
-        //     // from on_chain data to get the complete picture
-        //     // ...
-        // };
-        //
-
         // Build rounds map
-        // TODO: map roles
         let mut rounds: Vec<ApiRound> = Vec::new();
         for trace in &phragmen.traces {
             if let PhragmenTrace::RoundStart(round_number, candidates, _) = trace {
@@ -323,13 +263,12 @@ impl ApiElectionResults {
 
         Self {
             block_hash: format!("{:?}", onchain.block_hash),
-            election_data: ApiElectionData {
-                council_seats,
-                final_results,
-                candidates,
-                voters,
-                rounds,
-            },
+            election_rounds: onchain.election_rounds,
+            council_seats,
+            final_results,
+            candidates,
+            voters,
+            rounds,
         }
     }
 }

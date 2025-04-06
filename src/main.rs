@@ -17,6 +17,7 @@ use phragmen::*;
 mod traits;
 use traits::*;
 mod types;
+use types::api::*;
 use types::*;
 
 #[subxt::subxt(

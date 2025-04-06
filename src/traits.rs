@@ -5,5 +5,5 @@ pub trait OnchainElectionsDataProvider {
 }
 
 pub trait OnchainIdentityProvider {
-    async fn map_elections_identities(&self, elections: &mut ApiElectionResults) -> Result<()>;
+    async fn map_elections_identities(&self, elections: &mut ApiElectionData) -> Result<()>;
 }

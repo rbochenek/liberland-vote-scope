@@ -20,12 +20,20 @@ impl OnchainElectionsDataProvider for OnchainDataProvider<SubstrateConfig> {
         // Prepare block hash to operate on
         let block_hash = match hash {
             Some(hash) => {
-                event!(Level::DEBUG, "Block hash: {:?}  ", hash);
+                event!(
+                    Level::DEBUG,
+                    "Fetching election data at block hash: {:?}",
+                    hash
+                );
                 hash
             }
             None => {
                 let latest_block_hash = self.api.blocks().at_latest().await?.hash();
-                event!(Level::DEBUG, "Latest block hash: {:?}  ", latest_block_hash);
+                event!(
+                    Level::DEBUG,
+                    "Fetching election data at block hash: {:?} (latest)",
+                    latest_block_hash
+                );
                 latest_block_hash
             }
         };
@@ -96,7 +104,7 @@ impl OnchainElectionsDataProvider for OnchainDataProvider<SubstrateConfig> {
 }
 
 impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
-    async fn map_elections_identities(&self, elections: &mut ApiElectionResults) -> Result<()> {
+    async fn map_elections_identities(&self, elections: &mut ApiElectionData) -> Result<()> {
         use substrate::runtime_types::pallet_identity::types::Data;
 
         // TODO: This would really benefit from cache shared among all workers
@@ -105,7 +113,7 @@ impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
         let mut resolved: HashMap<String, String> = HashMap::new();
 
         // Resolve candidates
-        for candidate in &elections.election_data.final_results {
+        for candidate in &elections.final_results {
             let account = subxt::utils::AccountId32::from_str(&candidate.id.address)?;
             let storage = substrate::storage().identity().identity_of(&account);
 
@@ -167,21 +175,21 @@ impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
         }
 
         // Map candidate names in final_results
-        for candidate in elections.election_data.final_results.iter_mut() {
+        for candidate in elections.final_results.iter_mut() {
             if let Some(display_name) = resolved.get(&candidate.id.address) {
                 candidate.id.display_name = Some(display_name.clone());
             }
         }
 
         // Map candidate names in candidates
-        for candidate in elections.election_data.candidates.iter_mut() {
+        for candidate in elections.candidates.iter_mut() {
             if let Some(display_name) = resolved.get(&candidate.id.address) {
                 candidate.id.display_name = Some(display_name.clone());
             }
         }
 
         // Map candidates in voters
-        for voter in elections.election_data.voters.iter_mut() {
+        for voter in elections.voters.iter_mut() {
             for candidate in &mut voter.votes {
                 if let Some(display_name) = resolved.get(&candidate.address) {
                     candidate.display_name = Some(display_name.clone());
@@ -190,7 +198,7 @@ impl OnchainIdentityProvider for OnchainDataProvider<SubstrateConfig> {
         }
 
         // Map candidate names in rounds.scores
-        for round in elections.election_data.rounds.iter_mut() {
+        for round in elections.rounds.iter_mut() {
             for candidate in round.scores.iter_mut() {
                 if let Some(display_name) = resolved.get(&candidate.id.address) {
                     candidate.id.display_name = Some(display_name.clone());
