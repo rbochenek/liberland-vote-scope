@@ -10,4 +10,4 @@ EXPOSE 8080
 
 RUN cargo install --path .
 
-CMD ["liberland-vote-scope"]
+CMD ["liberland-vote-scope", "-v"]
