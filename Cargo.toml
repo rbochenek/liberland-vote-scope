@@ -1,7 +1,11 @@
 [package]
 name = "liberland-vote-scope"
-version = "0.1.0"
+description = "Simulate, analyze, and visualize electoral systems on the Liberland blockchain"
+version = "0.2.0"
 edition = "2024"
+license = "MIT"
+repository = "https://github.com/rbochenek/liberland-vote-scope"
+keywords = ["Liberland", "Blockchain", "Phragmen", "Elections"]
 
 [patch."https://github.com/paritytech/polkadot-sdk"]
 sp-npos-elections = { path = "patch/npos-elections" }
